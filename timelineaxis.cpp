@@ -11,21 +11,44 @@ TimeLineAxis::TimeLineAxis(QWidget* parent)
     setMouseTracking(true);
 }
 
-int TimeLineAxis::cursorValue() const
+void TimeLineAxis::setMinimum(int val)
 {
-    return qRound(value_offset_ + cursor_pos_.x() / scale_pixels_);
-}
-
-int TimeLineAxis::maxCursorValue() const
-{
-    return qRound((width() - cursorWidth()) / scale_pixels_);
-}
-
-void TimeLineAxis::moveCursor(int value)
-{
-    value_offset_ = value;
-    cursor_pos_.setX(value * scale_pixels_);
+    if (minimum_ == val) {
+        return;
+    }
+    minimum_ = val;
     update();
+}
+
+int TimeLineAxis::value() const
+{
+    return minimum_ + qRound(+cursor_pos_.x() / scale_pixels_);
+}
+
+int TimeLineAxis::minimum() const
+{
+    return minimum_;
+}
+
+int TimeLineAxis::maximum() const
+{
+    return minimum() + scaleCount();
+}
+
+void TimeLineAxis::setValue(int val)
+{
+    if (val == value()) {
+        return;
+    }
+    if (val > maximum()) {
+        minimum_ = val - scaleCount();
+    } else if (val < minimum()) {
+        minimum_ = val;
+    }
+    qreal cursor_x = (val - minimum_) * scale_pixels_;
+    cursor_pos_.setX(cursor_x);
+    update();
+    emit cursorValueChanged(val);
 }
 
 void TimeLineAxis::mousePressEvent(QMouseEvent* event)
@@ -48,16 +71,24 @@ void TimeLineAxis::mouseMoveEvent(QMouseEvent* event)
     if (!shape().contains(event->pos())) {
         event->ignore();
     }
-    if (cursor_picked_ && rect().contains(event->pos())) {
+    if (cursor_picked_) {
         qreal x = mapFromGlobal(QCursor::pos()).x() - cursorWidth() / 2;
+        int old_value = value();
+
+        if (x > width() - cursorWidth()) {
+            ++minimum_;
+        } else if (x < 0) {
+            --minimum_;
+            minimum_ = qMax(0, minimum_);
+        }
         x = qMin<qreal>(x, width() - cursorWidth());
         x = qMax(0.0, x);
         x = qRound(x / scale_pixels_) * scale_pixels_;
+        cursor_pos_.setX(x);
+        update();
 
-        if (!qFuzzyCompare(x, cursor_pos_.x())) {
-            cursor_pos_.setX(x);
-            update();
-            emit cursorValueChanged(cursorValue());
+        if (old_value != value()) {
+            emit cursorValueChanged(value());
         }
     }
 }
@@ -92,7 +123,7 @@ void TimeLineAxis::paintEvent(QPaintEvent* event)
         int sub_tick_count = scaleCount() / tick_count_;
 
         for (int i = 0; i <= tick_count_; ++i) {
-            QString tick_label = QString::number(value_offset_ + i * sub_tick_count);
+            QString tick_label = QString::number(minimum_ + i * sub_tick_count);
             qreal tick_label_width = painter.fontMetrics().boundingRect(tick_label).width();
             qreal x = cursorWidth() / 2 + i * (sub_tick_count * scale_pixels_);
             painter.drawLine(QPointF(x, cursorHeight()), QPointF(x, cursorHeight() * 0.9));
@@ -107,7 +138,7 @@ void TimeLineAxis::paintEvent(QPaintEvent* event)
         painter.setBrush(color);
         painter.drawPath(shape());
 
-        QString value_label = QString::number(cursorValue());
+        QString value_label = QString::number(value());
         qreal value_label_width = painter.fontMetrics().boundingRect(value_label).width();
         if (cursor_pos_.x() + cursorWidth() + value_label_width > width()) {
             painter.drawText(cursor_pos_.x() - value_label_width - 2, cursor_pos_.y() + painter.fontMetrics().height(), value_label);

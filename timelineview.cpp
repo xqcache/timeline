@@ -17,6 +17,8 @@ TimeLineView::TimeLineView(QWidget* parent)
 
     hbar_->setMinimum(0);
     vbar_->setMinimum(0);
+    hbar_->setMaximum(0);
+    vbar_->setMaximum(0);
 
     setupSignals();
 }
@@ -53,12 +55,12 @@ void TimeLineView::resizeEvent(QResizeEvent* event)
     vbar_->resize(vbar_->sizeHint().width(), hbar_->geometry().top());
     hbar_->resize(vbar_->geometry().left(), hbar_->sizeHint().height());
 
-    hbar_->setMaximum(axis_->scaleCount());
+    hbar_->setMaximum(qMax(hbar_->maximum(), axis_->scaleCount()));
 }
 
 void TimeLineView::onHBarValueChanged(int value)
 {
-    axis_->moveCursor(value);
+    axis_->setValue(value);
 }
 
 void TimeLineView::onVBarValueChanged(int value)
@@ -67,6 +69,7 @@ void TimeLineView::onVBarValueChanged(int value)
 
 void TimeLineView::onCursorValueChanged(int value)
 {
+    hbar_->setMaximum(qMax(hbar_->maximum(), value));
 }
 
 void TimeLineView::setupSignals()

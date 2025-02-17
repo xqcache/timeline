@@ -10,18 +10,19 @@ class TimeLineAxis : public QWidget {
 public:
     explicit TimeLineAxis(QWidget* parent);
 
+    inline void setCursorHeight(qreal height);
     inline qreal cursorHeight() const;
     inline qreal cursorWidth() const;
-    int cursorValue() const;
-    int maxCursorValue() const;
 
     inline int scaleCount() const;
     inline int tickCount() const;
 
-    inline void setCursorHeight(qreal height);
+    void setMinimum(int val);
+    void setValue(int value);
+    int value() const;
 
-    void moveCursor(int value);
-    void updateScale();
+    int minimum() const;
+    int maximum() const;
 
 signals:
     void cursorValueChanged(int value);
@@ -45,7 +46,7 @@ private:
 
     qreal scale_pixels_ = 10;
     int tick_count_ = 10;
-    int value_offset_ = 0;
+    int minimum_ = 0;
 };
 
 inline qreal TimeLineAxis::cursorHeight() const
