@@ -2,6 +2,8 @@
 
 #include <QtWidgets>
 
+class QStandardItemModel;
+
 class TimeLineAxis;
 class TimeLineScene;
 class TimeLineView : public QGraphicsView {
@@ -9,7 +11,9 @@ class TimeLineView : public QGraphicsView {
 public:
     explicit TimeLineView(QWidget* parent = nullptr);
 
-    void setCursorHeight(qreal height);
+    void setAxisHeight(qreal height);
+    void setModel(QStandardItemModel* model);
+    QStandardItemModel* model() const;
 
 protected:
     bool event(QEvent* event) override;

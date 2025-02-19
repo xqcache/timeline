@@ -10,13 +10,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-add_executable(${TARGET_NAME} main.cpp
-    timelineview.h timelineview.cpp
-    timelinescene.h
-    timelinescene.cpp
-    timelineaxis.h
-    timelineaxis.cpp
-    timelinerow.h
-    timelinerow.cpp
-)
+add_executable(${TARGET_NAME} main.cpp)
 target_link_libraries(${TARGET_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+add_subdirectory(lighttree)
+add_subdirectory(timeline)

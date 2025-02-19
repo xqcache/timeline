@@ -2,6 +2,8 @@
 
 #include <QGraphicsScene>
 
+class QStandardItemModel;
+
 class TimeLineAxis;
 class TimeLineView;
 class TimeLineRow;
@@ -16,11 +18,15 @@ public:
     inline const TimeLineView& view() const;
     inline const QSizeF& viewportSize() const;
 
+    void setModel(QStandardItemModel* model);
+    inline QStandardItemModel* model() const;
+
 private:
     TimeLineView& view_;
     QSizeF viewport_size_;
 
     std::vector<TimeLineRow*> row_items_;
+    QStandardItemModel* model_ { nullptr };
 };
 
 inline TimeLineView& TimeLineScene::view()
@@ -36,4 +42,9 @@ inline const TimeLineView& TimeLineScene::view() const
 inline const QSizeF& TimeLineScene::viewportSize() const
 {
     return viewport_size_;
+}
+
+inline QStandardItemModel* TimeLineScene::model() const
+{
+    return model_;
 }

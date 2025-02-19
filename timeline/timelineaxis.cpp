@@ -127,7 +127,12 @@ void TimeLineAxis::paintEvent(QPaintEvent* event)
             qreal tick_label_width = painter.fontMetrics().boundingRect(tick_label).width();
             qreal x = cursorWidth() / 2 + i * (sub_tick_count * scale_pixels_);
             painter.drawLine(QPointF(x, cursorHeight()), QPointF(x, cursorHeight() * 0.9));
-            painter.drawText(x - tick_label_width / 2, tick_label_y, tick_label);
+
+            qreal tick_label_x = x - tick_label_width / 2;
+            if (tick_label_x > width()) {
+                tick_label_x = x - tick_label_width;
+            }
+            painter.drawText(tick_label_x, tick_label_y, tick_label);
         }
         painter.restore();
     }

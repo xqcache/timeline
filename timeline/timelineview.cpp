@@ -23,10 +23,22 @@ TimeLineView::TimeLineView(QWidget* parent)
     setupSignals();
 }
 
-void TimeLineView::setCursorHeight(qreal height)
+void TimeLineView::setAxisHeight(qreal height)
 {
     axis_->setCursorHeight(height);
     setViewportMargins(0, qRound(axis_->cursorHeight()), vbar_->sizeHint().width(), hbar_->sizeHint().height());
+}
+
+void TimeLineView::setModel(QStandardItemModel* model)
+{
+    if (scene_) {
+        scene_->setModel(model);
+    }
+}
+
+QStandardItemModel* TimeLineView::model() const
+{
+    return scene_ ? scene_->model() : nullptr;
 }
 
 bool TimeLineView::event(QEvent* event)

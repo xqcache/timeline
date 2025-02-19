@@ -14,3 +14,8 @@ void TimeLineScene::setViewportSize(const QSizeF& size)
     viewport_size_ = size;
     setSceneRect(QRectF(QPointF(0, 0), size));
 }
+
+void TimeLineScene::setModel(QStandardItemModel* model)
+{
+    model_ = model;
+}
